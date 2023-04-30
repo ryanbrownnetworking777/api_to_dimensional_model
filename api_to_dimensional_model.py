@@ -41,7 +41,7 @@ def initialize_dimension(dimension_df, dimension_path, dimension_name):
         print(f"{dimension_name} dimension initialized.")
         return 
 
-def update_dimension(dimension_df, dimension_path, dimension_columns, dimension_name):
+def append_dimension(dimension_df, dimension_path, dimension_columns, dimension_name):
     dimension_disk_df = pd.read_csv(dimension_path)
     today =  int(datetime.datetime.today().date().strftime("%y%m%d"))
     new_dimension_df = pd.merge(
@@ -62,6 +62,8 @@ def update_dimension(dimension_df, dimension_path, dimension_columns, dimension_
     print(f"{dimension_name} dimension updated.")
     return
     
+def deactivate_dimension_entries()
+
 def process_dimension(df, dimension_path, dimension_columns, dimension_name, conversion_function, conversion_function_arguments):
     new_dimension_columns = create_model_columns(
                                                     columns=dimension_columns
@@ -77,7 +79,7 @@ def process_dimension(df, dimension_path, dimension_columns, dimension_name, con
                                         ,dimension_name = dimension_name
                                         )  
                                        
-    update_dimension(dimension_df=dimension_df 
+    append_dimension(dimension_df=dimension_df 
                      ,dimension_path=dimension_path 
                      ,dimension_columns=dimension_columns
                      ,dimension_name=dimension_name
@@ -87,8 +89,39 @@ def process_dimension(df, dimension_path, dimension_columns, dimension_name, con
 #     fact_df = df[fact_columns]
 #     fact_df.columns = new_fact_columns
 #     return fact_df
+"""
+Columns in the API results will be grouped by whatever id they will ultimately map up too. 
+A dictionary will specify the following:
+    {
 
-def process_fact(df, fact_columns):
+    "new_column":
+        {
+        
+            "processing_function": processing_function
+            ,"processing_function_arguments": [arguments as list] 
+        }
+    
+    }
+"""
+def string_columns_to_integer_id(df, id_column_name, columns, loading_function, loading_function_args):
+    dimension_df = loading_function(loading_function_args)
+    id_df = df[columns]
+    id = pd.merge(
+            id_df
+            ,dimension_df
+            ,how='inner'
+            ,on=columns
+            )[id_column_name]
+    return id
+    
+
+def process_fact(df, fact_column_processing_dict):
+    new_columns = [column_key for column_key in fact_column_processing_dict.keys()]
+    for new_column in new_columns:
+        column_dict = fact_column_processing_dict[new_column]
+        df[new_column] = column_dict['processing_function'](*column_dict['processing_function_arguments'])
+    new_df = df[new_columns]
+    return new_df
 
 def initialize_fact(fact_df, fact_path, fact_name, fact_column_processing_dict): 
     if os.path.isfile(fact_path):
