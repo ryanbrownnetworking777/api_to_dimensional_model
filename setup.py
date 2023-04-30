@@ -11,31 +11,21 @@ import os
 from setuptools import setup, find_packages
 
 # Meta information
-version = open('VERSION').read().strip()
 dirname = os.path.dirname(__file__)
 
 # Save version and author to __meta__.py
-path = os.path.join(dirname, 'src', 'python_boilerplate', '__meta__.py')
-data = '''# Automatically created. Please do not edit.
-__version__ = u'%s'
-__author__ = u'F\\xe1bio Mac\\xeado Mendes'
-''' % version
-with open(path, 'wb') as F:
-    F.write(data.encode())
-    
 setup(
     # Basic info
-    name='python-boilerplate',
-    version=version,
-    author='Fábio Macêdo Mendes',
-    author_email='fabiomacedomendes@gmail.com',
-    url='https://github.com/fabiommendes/python-boilerplate',
-    description='Creates the skeleton of your Python project.',
-    long_description=open('README.rst').read(),
+    name='api_to_dimensional_model',
+    version='0.0.1',
+    author='Ryan Brown',
+    author_email='ryanbrownnetworking777@gmail.com',
+    url='https://ghttps://github.com/ryanbrownnetworking777/api_to_dimensional_model',
+    description='Take the results of an API endpoint, and process them into star schema with Python.',
+    long_description=open('README.md').read(),
     classifiers=[
-        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'License :: OSI Approved :: MIT License' 
         'Operating System :: POSIX',
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries',
@@ -45,24 +35,21 @@ setup(
     package_dir={'': 'src'},
     packages=find_packages('src'),
     install_requires=[
-        'jinja2',
-        'invoke>=0.13',
-        'unidecode',
-        'six',
+        'pandas'
+        ,'requests'
     ],
     extras_require={
         'dev': [
-            'manuel',
-            'pytest',
-            'pytest-cov',
-            'coverage',
-            'mock',
+            'manuel'
+            ,'pytest'
+            ,'pytest-cov'
+            ,'coverage'
+            ,'mock'
         ],
     },
-
     # Data files
     package_data={
-        'python_boilerplate': [
+        'api_to_dimensional_model': [
             'templates/*.*',
             'templates/license/*.*',
             'templates/docs/*.*',
@@ -70,11 +57,6 @@ setup(
         ],
     },
 
-    # Scripts
-    entry_points={
-        'console_scripts': [
-            'python-boilerplate = python_boilerplate.__main__:main'],
-    },
 
     # Other configurations
     zip_safe=False,
