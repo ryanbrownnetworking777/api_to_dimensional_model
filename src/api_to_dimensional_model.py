@@ -26,7 +26,7 @@ def isolate_dimension(df, dimension_columns,  new_dimension_columns):
     dimension_df.columns = new_dimension_columns
     return dimension_df
 
-def initialize_dimension(dimension_df, dimension_check_function, dimension_check_function_arguments, dimension_name, saving_function, saving_function_args) -> None:
+def initialize_dimension(dimension_df, dimension_check_function, dimension_check_function_arguments, dimension_name, saving_function, saving_function_args={}) -> None:
     if dimension_check_function(**dimension_check_function_arguments):
         print(f"{dimension_name} dimension is already initialized.")
         return 
@@ -36,22 +36,21 @@ def initialize_dimension(dimension_df, dimension_check_function, dimension_check
         dimension_columns = [dimension_id_string] + list(dimension_df.columns)
         dimension_df[dimension_id_string] = dimension_df.index
         dimension_df = dimension_df[dimension_columns]
-        today =  int(datetime.datetime.today().date().strftime("%y%m%d"))
+        today =  int(datetime.datetime.today().date().strftime("%Y%m%d"))
         dimension_df['effective_from'] = today
         dimension_df['effective_till'] = 99990101
         dimension_df['is_active'] = 'Y'
-        if saving_function_args != None:
+        if saving_function_args != {}:
             saving_function_args['df'] = dimension_df
             saving_function(**saving_function_args)
         else:
             saving_function(df=dimension_df)
-        # dimension_df.sort_values(dimension_id_string).to_csv(dimension_path, index=False) 
         print(f"{dimension_name} dimension initialized.")
         return 
 
 def append_dimension(dimension_df, dimension_path, dimension_columns, dimension_name):
     dimension_disk_df = pd.read_csv(dimension_path)
-    today =  int(datetime.datetime.today().date().strftime("%y%m%d"))
+    today =  int(datetime.datetime.today().date().strftime("%Y%m%d"))
     new_dimension_df = pd.merge(
             dimension_df[dimension_columns]
             ,dimension_disk_df[dimension_columns]
@@ -71,7 +70,7 @@ def append_dimension(dimension_df, dimension_path, dimension_columns, dimension_
     return
     
 def deactivate_dimension_entries(dimension_df, entries_to_deactivate_df, dimension_path) -> None:
-    today =  int(datetime.datetime.today().date().strftime("%y%m%d"))
+    today =  int(datetime.datetime.today().date().strftime("%Y%m%d"))
     to_deactivate_entries = pd.merge(
             dimension_df
             ,entries_to_deactivate_df
