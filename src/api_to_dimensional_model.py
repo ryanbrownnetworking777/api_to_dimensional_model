@@ -16,7 +16,9 @@ conversion_function_arguments is a list of arguments that will be passed positio
 """
 def create_dimension_columns(columns, conversion_function, conversion_function_arguments={}):
     if conversion_function_arguments != {}:
-        model_columns = conversion_function(columns, **{conversion_function_arguments})
+        conversion_function_arguments['columns'] = columns
+        print(conversion_function_arguments)
+        model_columns = conversion_function(**conversion_function_arguments)
     else:
         model_columns = conversion_function(columns)
     return model_columns
@@ -26,7 +28,7 @@ def isolate_dimension(df, dimension_columns,  new_dimension_columns):
     dimension_df.columns = new_dimension_columns
     return dimension_df
 
-def initialize_dimension(dimension_df, dimension_check_function, dimension_check_function_arguments, dimension_name, saving_function, saving_function_args={}) -> None:
+def initialize_dimension(dimension_df, dimension_check_function, dimension_check_function_arguments, dimension_name, saving_function, saving_function_arguments={}) -> None:
     if dimension_check_function(**dimension_check_function_arguments):
         print(f"{dimension_name} dimension is already initialized.")
         return 
@@ -40,9 +42,10 @@ def initialize_dimension(dimension_df, dimension_check_function, dimension_check
         dimension_df['effective_from'] = today
         dimension_df['effective_till'] = 99990101
         dimension_df['is_active'] = 'Y'
-        if saving_function_args != {}:
-            saving_function_args['df'] = dimension_df
-            saving_function(**saving_function_args)
+        dimension_df = dimension_df.fillna("N/A")
+        if saving_function_arguments != {}:
+            saving_function_arguments['df'] = dimension_df
+            saving_function(**saving_function_arguments)
         else:
             saving_function(df=dimension_df)
         print(f"{dimension_name} dimension initialized.")
@@ -90,7 +93,7 @@ def deactivate_dimension_entries(dimension_df, entries_to_deactivate_df, dimensi
 
 
 
-def process_dimension(df, dimension_path, dimension_columns, dimension_name, conversion_function, conversion_function_arguments) -> None: 
+def process_dimension(df, dimension_columns, dimension_name, conversion_function, conversion_function_arguments, dimension_check_function, dimension_check_function_arguments, saving_function, saving_function_arguments) -> None: 
     new_dimension_columns = create_dimension_columns(
                                                     columns=dimension_columns
                                                     ,conversion_function=conversion_function
@@ -101,8 +104,11 @@ def process_dimension(df, dimension_path, dimension_columns, dimension_name, con
                                      new_dimension_columns=new_dimension_columns)
     # return dimension_df
     initialize_dimension(dimension_df=dimension_df 
-                                        ,dimension_path=dimension_path 
                                         ,dimension_name = dimension_name
+                                        ,dimension_check_function=dimension_check_function
+                                        ,dimension_check_function_arguments=dimension_check_function_arguments
+                                        ,saving_function=saving_function
+                                        ,saving_function_arguments=saving_function_arguments
                                         )  
                                        
     # append_dimension(dimension_df=dimension_df 
@@ -129,8 +135,8 @@ A dictionary will specify the following:
     
     }
 """
-def string_columns_to_integer_id(df, id_column_name, columns, loading_function, loading_function_args):
-    dimension_df = loading_function(loading_function_args)
+def string_columns_to_integer_id(df, id_column_name, columns, loading_function, loading_function_arguments):
+    dimension_df = loading_function(loading_function_arguments)
     id_df = df[columns]
     id = pd.merge(
             id_df
