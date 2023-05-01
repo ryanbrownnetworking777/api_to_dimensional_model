@@ -163,4 +163,4 @@ cython_debug/
 #Testing Jupyter notebooks
 /**/testing_*.ipynb
 /**/*.csv
-
+/**/copy_pasta
