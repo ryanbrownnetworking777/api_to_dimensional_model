@@ -14,17 +14,20 @@ def load_configs(yaml_path):
 `conversion_function` here is a python function that will take a string, and output a new string according to whatever transformations are necessary. 
 conversion_function_arguments is a list of arguments that will be passed positionally to the `conversion_function`
 """
-def create_model_columns(columns, conversion_function, conversion_function_arguments):
-   model_columns = [conversion_function(*[column + conversion_function_arguments]) for column in columns] 
-   return model_columns
+def create_dimension_columns(columns, conversion_function, conversion_function_arguments={}):
+    if conversion_function_arguments != {}:
+        model_columns = conversion_function(columns, **{conversion_function_arguments})
+    else:
+        model_columns = conversion_function(columns)
+    return model_columns
 
 def isolate_dimension(df, dimension_columns,  new_dimension_columns):
     dimension_df = df[dimension_columns]
     dimension_df.columns = new_dimension_columns
     return dimension_df
 
-def initialize_dimension(dimension_df, dimension_path, dimension_name):
-    if os.path.isfile(dimension_path):
+def initialize_dimension(dimension_df, dimension_check_function, dimension_check_function_arguments, dimension_name, saving_function, saving_function_args) -> None:
+    if dimension_check_function(**dimension_check_function_arguments):
         print(f"{dimension_name} dimension is already initialized.")
         return 
     else:
@@ -37,7 +40,12 @@ def initialize_dimension(dimension_df, dimension_path, dimension_name):
         dimension_df['effective_from'] = today
         dimension_df['effective_till'] = 99990101
         dimension_df['is_active'] = 'Y'
-        dimension_df.sort_values(dimension_id_string).to_csv(dimension_path, index=False) 
+        if saving_function_args != None:
+            saving_function_args['df'] = dimension_df
+            saving_function(**saving_function_args)
+        else:
+            saving_function(df=dimension_df)
+        # dimension_df.sort_values(dimension_id_string).to_csv(dimension_path, index=False) 
         print(f"{dimension_name} dimension initialized.")
         return 
 
@@ -84,7 +92,7 @@ def deactivate_dimension_entries(dimension_df, entries_to_deactivate_df, dimensi
 
 
 def process_dimension(df, dimension_path, dimension_columns, dimension_name, conversion_function, conversion_function_arguments) -> None: 
-    new_dimension_columns = create_model_columns(
+    new_dimension_columns = create_dimension_columns(
                                                     columns=dimension_columns
                                                     ,conversion_function=conversion_function
                                                     ,conversion_function_arguments=conversion_function_arguments
@@ -92,17 +100,17 @@ def process_dimension(df, dimension_path, dimension_columns, dimension_name, con
     dimension_df = isolate_dimension(df=df, 
                                      dimension_columns=dimension_columns, 
                                      new_dimension_columns=new_dimension_columns)
-
+    # return dimension_df
     initialize_dimension(dimension_df=dimension_df 
                                         ,dimension_path=dimension_path 
                                         ,dimension_name = dimension_name
                                         )  
                                        
-    append_dimension(dimension_df=dimension_df 
-                     ,dimension_path=dimension_path 
-                     ,dimension_columns=dimension_columns
-                     ,dimension_name=dimension_name
-                    )
+    # append_dimension(dimension_df=dimension_df 
+    #                  ,dimension_path=dimension_path 
+    #                  ,dimension_columns=dimension_columns
+    #                  ,dimension_name=dimension_name
+    #                 )
     return 
 # def isolate_fact(df, fact_columns, new_fact_columns):
 #     fact_df = df[fact_columns]
