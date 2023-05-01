@@ -31,10 +31,10 @@ def initialize_dimension(dimension_df, dimension_check_function, dimension_check
         print(f"{dimension_name} dimension is already initialized.")
         return 
     else:
-        dimension_df = dimension_df.drop_duplicates()
+        dimension_df = dimension_df.drop_duplicates().reset_index(drop='index')
         dimension_id_string = f'{dimension_name}_id'
-        dimension_df[dimension_id_string] = dimension_df.index
         dimension_columns = [dimension_id_string] + list(dimension_df.columns)
+        dimension_df[dimension_id_string] = dimension_df.index
         dimension_df = dimension_df[dimension_columns]
         today =  int(datetime.datetime.today().date().strftime("%y%m%d"))
         dimension_df['effective_from'] = today
