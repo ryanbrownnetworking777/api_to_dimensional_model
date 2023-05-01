@@ -160,7 +160,10 @@ cython_debug/
 #.idea/
 
 
-#Testing Jupyter notebooks
-/**/testing_*.ipynb
+# Testing Jupyter notebooks
+/**/*.ipynb
+!/**/example*.ipynb
+# Exclude any CSV files generated through testing. 
 /**/*.csv
+# Exclude buffer for copy_pasting into vim
 /**/copy_pasta
