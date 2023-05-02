@@ -51,8 +51,9 @@ def initialize_dimension(dimension_df, dimension_check_function, dimension_check
         print(f"{dimension_name} dimension initialized.")
         return 
 
-def append_dimension(dimension_df, dimension_path, dimension_columns, dimension_name):
-    dimension_disk_df = pd.read_csv(dimension_path)
+def append_dimension(dimension_df, dimension_name, dimension_columns, loading_function, loading_function_arguments, saving_function, saving_function_arguments={}) -> None:
+
+    dimension_disk_df = loading_function(**loading_function_arguments)
     today =  int(datetime.datetime.today().date().strftime("%Y%m%d"))
     new_dimension_df = pd.merge(
             dimension_df[dimension_columns]
@@ -60,19 +61,24 @@ def append_dimension(dimension_df, dimension_path, dimension_columns, dimension_
             ,how='outer'
             ,indicator=True
             )
-    new_dimension_df = new_dimension_df[(new_dimension_df._merge == 'left_only')].drop('_merge',axis=1)
+    new_dimension_df = new_dimension_df[(new_dimension_df._merge == 'left_only')].drop('_merge',axis=1).drop_duplicates()
     new_dimension_df['effective_from'] = today
     new_dimension_df['effective_till'] = 99990101
     new_dimension_df['is_active'] = 'Y'
     dimension_id_string = f"{dimension_name}_id"
-    max_id = dimension_df[dimension_id_string].max()
-    new_dimension_df[dimension_id_string] = [(val + max_id+1) for val in new_dimension_df.index]
+    max_id = dimension_disk_df[dimension_id_string].max()
+    new_dimension_df[dimension_id_string] = [int(val + max_id+1) for val in new_dimension_df.index]
     dimension_df = pd.concat([dimension_disk_df, new_dimension_df]) 
-    dimension_df.sort_values(dimension_id_string).to_csv(dimension_path, index=False) 
-    print(f"{dimension_name} dimension updated.")
+    dimension_df[dimension_id_string] = dimension_df[dimension_id_string].astype(int)
+    if saving_function_arguments !={}:
+        saving_function_arguments['df'] = dimension_df
+        saving_function(**saving_function_arguments)
+    else:
+        saving_function(df=dimension_df)
+    print(f"{dimension_name} dimension updated with {len(new_dimension_df)} new records.")
     return
     
-def deactivate_dimension_entries(dimension_df, entries_to_deactivate_df, dimension_path) -> None:
+def deactivate_dimension_entries(dimension_df, dimension_name, entries_to_deactivate_df, saving_function, saving_function_arguments={}) -> None:
     today =  int(datetime.datetime.today().date().strftime("%Y%m%d"))
     to_deactivate_entries = pd.merge(
             dimension_df
@@ -81,14 +87,20 @@ def deactivate_dimension_entries(dimension_df, entries_to_deactivate_df, dimensi
             ,on = list(entries_to_deactivate_df.columns)
             ,indicator=True
             )
-    to_deactivate_entries_locations = to_deactivate_entries[(to_deactivate_entries._merge == '_both')].index
-    effective_till = list(dimension_df['effective_till'])
-    effective_till[to_deactivate_entries_locations] = today
-    is_active = list(dimension_df['is_active'])
-    is_active[to_deactivate_entries_locations] = 'N'
-    dimension_df['effective_till'] = effective_till
-    dimension_df['is_active'] = is_active
-    dimension_df.to_csv(dimension_path, index=False)
+    to_deactivate_entries_locations = list(to_deactivate_entries[(to_deactivate_entries._merge == '_both')].index)
+    print(to_deactivate_entries_locations)
+    # effective_till = list(dimension_df['effective_till'])
+    # effective_till[to_deactivate_entries_locations] = today
+    # is_active = list(dimension_df['is_active'])
+    # is_active[to_deactivate_entries_locations] = 'N'
+    # dimension_df['effective_till'] = effective_till
+    # dimension_df['is_active'] = is_active
+    # if saving_function_arguments !={}:
+    #     saving_function_arguments['df'] = dimension_df
+    #     saving_function(**saving_function_arguments)
+    # else:
+    #     saving_function(df=dimension_df)
+    # print(f"{len(to_deactivate_entries_locations)} deactivated from dimension {dimension_name}")
     return
 
 
@@ -111,11 +123,11 @@ def process_dimension(df, dimension_columns, dimension_name, conversion_function
                                         ,saving_function_arguments=saving_function_arguments
                                         )  
                                        
-    # append_dimension(dimension_df=dimension_df 
-    #                  ,dimension_path=dimension_path 
-    #                  ,dimension_columns=dimension_columns
-    #                  ,dimension_name=dimension_name
-    #                 )
+    append_dimension(dimension_df=dimension_df 
+                     ,dimension_path=dimension_path 
+                     ,dimension_columns=dimension_columns
+                     ,dimension_name=dimension_name
+                    )
     return 
 # def isolate_fact(df, fact_columns, new_fact_columns):
 #     fact_df = df[fact_columns]
