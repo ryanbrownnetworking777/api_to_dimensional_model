@@ -20,10 +20,10 @@ def create_dimension_columns(columns, conversion_function, conversion_function_a
         print(conversion_function_arguments)
         model_columns = conversion_function(**conversion_function_arguments)
     else:
-        model_columns = conversion_function(columns)
+        model_columns = conversion_function(columns=columns)
     return model_columns
 
-def isolate_dimension(df, dimension_columns,  new_dimension_columns):
+def isolate_dimension(df, dimension_columns,  new_dimension_columns) -> pd.DataFrame:
     dimension_df = df[dimension_columns]
     dimension_df.columns = new_dimension_columns
     return dimension_df
@@ -43,7 +43,6 @@ def initialize_dimension(dimension_df,  dimension_name) -> pd.DataFrame:
     return dimension_df 
 
 def append_dimension(dimension_df, existing_dimension_df, dimension_name, dimension_columns) -> pd.DataFrame:
-
     today =  int(datetime.datetime.today().date().strftime("%Y%m%d"))
     new_dimension_df = pd.merge(
             dimension_df[dimension_columns]
@@ -139,14 +138,15 @@ A dictionary will specify the following:
     
     }
 """
-def string_columns_to_integer_id(df, id_column_name, columns, loading_function, loading_function_arguments):
+def string_columns_to_integer_id(df, id_column_name, fact_columns, dimension_columns, loading_function, loading_function_arguments):
     dimension_df = loading_function(**loading_function_arguments)
-    id_df = df[columns]
+    id_df = df[fact_columns]
     id = pd.merge(
             id_df
             ,dimension_df
             ,how='inner'
-            ,on=columns
+            ,left_on=fact_columns
+            ,right_on=dimension_columns
             )[id_column_name]
     return id
     
