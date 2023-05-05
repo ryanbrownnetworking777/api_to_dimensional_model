@@ -50,7 +50,7 @@ def append_dimension(dimension_df, existing_dimension_df, dimension_name, dimens
             ,how='outer'
             ,indicator=True
             )
-    new_dimension_df = new_dimension_df[(new_dimension_df._merge == 'left_only')].drop('_merge',axis=1).drop_duplicates()
+    new_dimension_df = new_dimension_df[(new_dimension_df._merge == 'left_only')].drop('_merge',axis=1).drop_duplicates().reset_index(drop='index')
     new_dimension_df['effective_from'] = today
     new_dimension_df['effective_till'] = 99990101
     new_dimension_df['is_active'] = 'Y'
@@ -141,6 +141,8 @@ A dictionary will specify the following:
 def string_columns_to_integer_id(df, id_column_name, fact_columns, dimension_columns, loading_function, loading_function_arguments):
     dimension_df = loading_function(**loading_function_arguments)
     id_df = df[fact_columns]
+    print(id_df)
+    print(dimension_df[dimension_columns])
     id = pd.merge(
             id_df
             ,dimension_df
