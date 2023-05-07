@@ -169,6 +169,7 @@ def append_fact(fact_df, fact_name, existing_fact_df) -> pd.DataFrame:
             ,indicator=True
             )
     new_fact_df = new_fact_df[(new_fact_df._merge == 'left_only')].drop('_merge',axis=1)
+    print(new_fact_df)
     fact_df = pd.concat([existing_fact_df, new_fact_df]) 
     print(f"{fact_name} fact updated with {len(new_fact_df)} new records.")
     return fact_df
