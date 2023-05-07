@@ -84,7 +84,7 @@ def deactivate_dimension_entries(dimension_df, entries_to_deactivate_df )-> pd.D
 
 
 
-def process_dimension(df, dimension_columns, dimension_name, conversion_function, conversion_function_arguments, dimension_check_function, dimension_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments) -> None: 
+def process_dimension(df, dimension_columns, dimension_name, conversion_function, conversion_function_arguments, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments) -> None: 
     new_dimension_columns = create_dimension_columns(
                                                     columns=dimension_columns
                                                     ,conversion_function=conversion_function
@@ -95,7 +95,7 @@ def process_dimension(df, dimension_columns, dimension_name, conversion_function
                                      dimension_columns=dimension_columns, 
                                      new_dimension_columns=new_dimension_columns
                                      )
-    dimension_check = dimension_check_function(**dimension_check_function_arguments) 
+    dimension_check = table_check_function(**table_check_function_arguments) 
     if  dimension_check == False:
         dimension_df = initialize_dimension(
                                         dimension_df=dimension_df 
@@ -141,8 +141,8 @@ A dictionary will specify the following:
 def string_columns_to_integer_id(df, id_column_name, fact_columns, dimension_columns, loading_function, loading_function_arguments):
     dimension_df = loading_function(**loading_function_arguments)
     id_df = df[fact_columns]
-    print(id_df)
-    print(dimension_df[dimension_columns])
+    # print(id_df)
+    # print(dimension_df[dimension_columns])
     id = pd.merge(
             id_df
             ,dimension_df
@@ -161,45 +161,38 @@ def create_fact(df, fact_column_processing_dict):
     new_df = df[new_columns]
     return new_df
 
-def initialize_fact(fact_df, fact_path, fact_name): 
-    if os.path.isfile(fact_path):
-        print(f"{fact_name} fact is already initialized.")
-        return 
-    else:
-        fact_id_string = f"{fact_name}_id" 
-        fact_df[fact_id_string] = fact_df.index
-        fact_df.sort_values(fact_id_string).to_csv(fact_path, index=False) 
-        print(f"{fact_name} fact initialized.")
-        return 
-
-def append_fact(fact_df, fact_path, fact_columns, fact_name):
-    fact_disk_df = pd.read_csv(fact_path) 
+def append_fact(fact_df, fact_name, existing_fact_df) -> pd.DataFrame:
     new_fact_df = pd.merge(
-            fact_df[fact_columns]
-            ,fact_disk_df[fact_columns]
+            fact_df
+            ,existing_fact_df
             ,how='outer'
             ,indicator=True
             )
     new_fact_df = new_fact_df[(new_fact_df._merge == 'left_only')].drop('_merge',axis=1)
-    fact_id_string = f"{fact_name}_id"
-    max_id = fact_df[fact_id_string].max()
-    new_fact_df[fact_id_string] = [(val + max_id+1) for val in new_fact_df.index]
-    fact_df = pd.concat([fact_disk_df, new_fact_df]) 
-    fact_df.sort_values(fact_id_string).to_csv(fact_path, index=False) 
-    print(f"{fact_name} fact updated.")
-    return
+    fact_df = pd.concat([existing_fact_df, new_fact_df]) 
+    print(f"{fact_name} fact updated with {len(new_fact_df)} new records.")
+    return fact_df
 
-def process_fact(df, fact_path, fact_columns, fact_name, fact_column_processing_dict) -> None: 
+
+def process_fact(df, fact_name, fact_column_processing_dict, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments)  -> None: 
     fact_df = create_fact(df=df, fact_column_processing_dict=fact_column_processing_dict)
-
-    initialize_fact(fact_df=fact_df 
-                                        ,fact_path=fact_path 
-                                        ,fact_name = fact_name
-                                        )  
-                                       
-    append_fact(fact_df=fact_df 
-                     ,fact_path=fact_path 
-                     ,fact_columns=fact_columns
-                     ,fact_name=fact_name
-                    )
+    fact_check = table_check_function(**table_check_function_arguments) 
+    if  fact_check == False:
+        if saving_function_arguments != {}:
+            saving_function_arguments['df'] = fact_df
+            saving_function(**saving_function_arguments)
+        else:
+            saving_function(df=fact_df)
+        print(f"Fact table {fact_name} initalized.")
+    elif fact_check == True:
+        existing_fact_df = loading_function(**loading_function_arguments)
+        fact_df = append_fact(fact_df=fact_df, 
+                              existing_fact_df=existing_fact_df, 
+                              fact_name=fact_name)
+        if saving_function_arguments !={}:
+            saving_function_arguments['df'] = fact_df
+            saving_function(**saving_function_arguments)
+        else:
+            saving_function(df=fact_df)
+        print(f"Fact table {fact_name} updated.")
     return 
