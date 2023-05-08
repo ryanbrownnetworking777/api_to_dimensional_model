@@ -1,9 +1,4 @@
 import datetime
-import requests
-from base64 import b64encode
-import time
-from io import BytesIO
-import os
 import pandas as pd
 import yaml
 
@@ -81,7 +76,9 @@ def deactivate_dimension_entries(dimension_df, entries_to_deactivate_df )-> pd.D
     dimension_df['is_active'] = is_active
     # print(f"{len(to_deactivate_entries_locations)} deactivated from dimension {dimension_name}")
     return dimension_df
-
+'''
+Conversion function is a function that will take a list of columnsa and return another list of columns in the order desired for the final dimension table. Conversion function arguments are arguments passed as a dictionary and expanded using ** notation in the processing function. table_check_function will return a boolean for whether or not the table already exists, and arguments are passed as a dictionary and expanded using ** notation.  
+'''
 
 
 def process_dimension(df, dimension_columns, dimension_name, conversion_function, conversion_function_arguments, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments) -> None: 
@@ -120,10 +117,7 @@ def process_dimension(df, dimension_columns, dimension_name, conversion_function
         else:
             saving_function(df=dimension_df)
     return 
-# def isolate_fact(df, fact_columns, new_fact_columns):
-#     fact_df = df[fact_columns]
-#     fact_df.columns = new_fact_columns
-#     return fact_df
+
 """
 Columns in the API results will be grouped by whatever id they will ultimately map up too. 
 A dictionary will specify the following:
