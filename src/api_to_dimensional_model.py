@@ -7,7 +7,7 @@ def load_configs(yaml_path):
 
 """
 `conversion_function` here is a python function that will take a string, and output a new string according to whatever transformations are necessary. 
-conversion_function_arguments is a list of arguments that will be passed positionally to the `conversion_function` via the ** operator. 
+conversion_function_arguments is a list of arguments that will be passed positionally to the `conversion_function` via the ** operator. `create_dimension_columns` assumes that at least one argument in the `conversion_function` is `columns` 
 """
 def create_dimension_columns(columns, conversion_function, conversion_function_arguments={}):
     if conversion_function_arguments != {}:
@@ -18,9 +18,14 @@ def create_dimension_columns(columns, conversion_function, conversion_function_a
         model_columns = conversion_function(columns=columns)
     return model_columns
 
+"""
+Returns a pandas dataframe filtered down to the exact columns needed; with those columns renamed with new names. 
+"""
 def isolate_dimension(df, dimension_columns,  new_dimension_columns) -> pd.DataFrame:
     dimension_df = df[dimension_columns]
-    dimension_df.columns = new_dimension_columns
+    new_dimension_column_mapping = {dimension_columns[i]: new_column for i, new_column in enumerate(new_dimension_columns)}
+    dimension_df.rename(mapper=new_dimension_column_mapping, axis=1, inplace=True)
+    # dimension_df.columns = new_dimension_columns
     return dimension_df
 
 def initialize_dimension(dimension_df,  dimension_name) -> pd.DataFrame:
