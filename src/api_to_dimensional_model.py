@@ -7,7 +7,7 @@ def load_configs(yaml_path):
 
 """
 `conversion_function` here is a python function that will take a string, and output a new string according to whatever transformations are necessary. 
-conversion_function_arguments is a list of arguments that will be passed positionally to the `conversion_function`
+conversion_function_arguments is a list of arguments that will be passed positionally to the `conversion_function` via the ** operator. 
 """
 def create_dimension_columns(columns, conversion_function, conversion_function_arguments={}):
     if conversion_function_arguments != {}:
