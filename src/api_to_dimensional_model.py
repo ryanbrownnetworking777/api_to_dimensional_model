@@ -177,6 +177,7 @@ def append_fact(fact_df, fact_name, existing_fact_df) -> pd.DataFrame:
 def process_fact(df, fact_name, fact_column_processing_dict, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments)  -> None: 
     fact_df = create_fact(df=df, fact_column_processing_dict=fact_column_processing_dict)
     fact_check = table_check_function(**table_check_function_arguments) 
+    print(fact_check)
     if  fact_check == False:
         if saving_function_arguments != {}:
             saving_function_arguments['df'] = fact_df
@@ -191,8 +192,9 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
                               fact_name=fact_name)
         if saving_function_arguments !={}:
             saving_function_arguments['df'] = fact_df
-            saving_function(**saving_function_arguments)
+            # saving_function(**saving_function_arguments)
         else:
-            saving_function(df=fact_df)
+            print("No arguments passed to saving functions")
+            # saving_function(df=fact_df)
         print(f"Fact table {fact_name} updated.")
     return 
