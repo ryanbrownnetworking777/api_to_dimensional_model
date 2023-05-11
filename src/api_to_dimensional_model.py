@@ -185,9 +185,9 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
                               fact_name=fact_name)
         if saving_function_arguments !={}:
             saving_function_arguments['df'] = fact_df
-            # saving_function(**saving_function_arguments)
+            saving_function(**saving_function_arguments)
         else:
             print("No arguments passed to saving functions")
-            # saving_function(df=fact_df)
+            saving_function(df=fact_df)
         print(f"Fact table {fact_name} updated.")
     return 
