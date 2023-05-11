@@ -160,19 +160,12 @@ def create_fact(df, fact_column_processing_dict):
     new_df = df[new_columns]
     return new_df
 
-def append_fact(fact_df, fact_name, existing_fact_df) -> pd.DataFrame:
-    new_fact_df = pd.merge(
-            fact_df
-            ,existing_fact_df
-            ,how='outer'
-            ,indicator=True
-            )
-    new_fact_df = new_fact_df[(new_fact_df._merge == 'left_only')].drop('_merge',axis=1)
-    print(new_fact_df)
-    fact_df = pd.concat([existing_fact_df, new_fact_df]) 
-    print(f"{fact_name} fact updated with {len(new_fact_df)} new records.")
-    return fact_df
 
+def append_fact(fact_df, fact_name, existing_fact_df) -> pd.DataFrame:
+    new_fact_df = existing_fact_df.combine_first(fact_df)
+    appended_len = len(new_fact_df) - len(existing_fact_df)
+    print(f"{fact_name} fact appended with {appended_len} new records.")
+    return new_fact_df
 
 def process_fact(df, fact_name, fact_column_processing_dict, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments)  -> None: 
     fact_df = create_fact(df=df, fact_column_processing_dict=fact_column_processing_dict)
