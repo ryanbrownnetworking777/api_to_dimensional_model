@@ -162,7 +162,7 @@ def create_fact(df, fact_column_processing_dict):
 
 
 def append_fact(fact_df, fact_name, existing_fact_df) -> pd.DataFrame:
-    new_fact_df = existing_fact_df.combine_first(fact_df)
+    new_fact_df = fact_df.combine_first(existing_fact_df)
     appended_len = len(new_fact_df) - len(existing_fact_df)
     print(f"{fact_name} fact appended with {appended_len} new records.")
     return new_fact_df
