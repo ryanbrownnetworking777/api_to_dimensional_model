@@ -178,7 +178,7 @@ def append_fact(fact_df, fact_name, existing_fact_df, date_column) -> pd.DataFra
     return new_fact_df
 
 def process_fact(df, fact_name, fact_column_processing_dict, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments, date_column)  -> None: 
-    fact_df = create_fact(df=df, fact_column_processing_dict=fact_column_processing_dict)
+    fact_df = create_fact(df=df, fact_column_processing_dict=fact_column_processing_dict, fact_name=fact_name)
     fact_check = table_check_function(**table_check_function_arguments) 
     print(fact_check)
     if  fact_check == False:
