@@ -163,7 +163,7 @@ def create_fact(df, fact_column_processing_dict,fact_name='') -> pd.DataFrame:
         to_concat_columns = [column_key for column_key 
                              in fact_column_processing_dict.keys() 
                              if fact_column_processing_dict[column_key]["id_column"]==True]
-        df[fact_id_string] =  df[to_concat_columns].apply(lambda x: ''.join(x.astype(str)), axis=1).astype(np.int64)
+        df[fact_id_string] =  df[to_concat_columns].apply(lambda x: ''.join(x.astype(str)), axis=1)
         new_columns = [fact_id_string] + new_columns
     new_df = df[new_columns]
     return new_df
