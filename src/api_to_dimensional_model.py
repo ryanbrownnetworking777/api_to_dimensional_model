@@ -152,11 +152,18 @@ def string_columns_to_integer_id(df, id_column_name, fact_columns, dimension_col
     return id
     
 
-def create_fact(df, fact_column_processing_dict):
+def create_fact(df, fact_column_processing_dict,fact_name='') -> pd.DataFrame:
     new_columns = [column_key for column_key in fact_column_processing_dict.keys()]
     for new_column in new_columns:
         column_dict = fact_column_processing_dict[new_column]
         df[new_column] = column_dict['processing_function'](**column_dict['processing_function_arguments'])
+    if fact_name !="":
+        fact_id_string = f"{fact_name}_id"
+        to_concat_columns = [column_key for column_key 
+                             in fact_column_processing_dict.keys() 
+                             if fact_column_processing_dict[column_key]["id_column"]==True]
+        df[fact_id_string] =  df[to_concat_columns].apply(lambda x: ''.join(x.astype(str)), axis=1)
+        new_columns = [fact_id_string] + new_columns
     new_df = df[new_columns]
     return new_df
 
