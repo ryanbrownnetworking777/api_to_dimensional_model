@@ -93,6 +93,8 @@ def process_dimension(df, dimension_columns, dimension_name, conversion_function
                                                     ,conversion_function=conversion_function
                                                     ,conversion_function_arguments=conversion_function_arguments
                                                     )
+    dimension_id_string = f'{dimension_name}_id'
+    print(dimension_id_string)
     dimension_df = isolate_dimension(
                                      df=df, 
                                      dimension_columns=dimension_columns, 
@@ -169,6 +171,9 @@ def create_fact(df, fact_column_processing_dict,fact_name='') -> pd.DataFrame:
     return new_df
 
 
+"""
+To Do -- Switch this to accepting a criteria function with arguments so any number of cases can be handled.
+"""
 def append_fact(fact_df, fact_name, existing_fact_df, date_column) -> pd.DataFrame:
     max_date = existing_fact_df[date_column].max()
     print(max_date)
