@@ -101,6 +101,7 @@ def process_dimension(df, dimension_columns, dimension_name, conversion_function
                                      new_dimension_columns=new_dimension_columns
                                      )
     dimension_check = table_check_function(**table_check_function_arguments) 
+    print(dimension_check)
     if  dimension_check == False:
         dimension_df = initialize_dimension(
                                         dimension_df=dimension_df 
