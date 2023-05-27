@@ -110,7 +110,9 @@ def process_dimension(df, dimension_columns, dimension_name, conversion_function
         if saving_function_arguments != {}:
             saving_function_arguments['df'] = dimension_df
             if 'additional_processing' in saving_function_arguments.keys():
-                eval(saving_function_arguments['additional_processing'])
+                additional_processing_string = saving_function_arguments['additional_processing']
+                compiled_additional_processing = compile(additional_processing_string,'<string>','exec')
+                eval(compiled_additional_processing)
                 saving_function_arguments.pop('additional_processing')
                 for key in saving_function_arguments.keys():
                     print(key)
