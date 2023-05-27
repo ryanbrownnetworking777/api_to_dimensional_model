@@ -112,6 +112,8 @@ def process_dimension(df, dimension_columns, dimension_name, conversion_function
             if 'additional_processing' in saving_function_arguments.keys():
                 eval(saving_function_arguments['additional_processing'])
                 saving_function_arguments.pop('additional_processing')
+                for key in saving_function_arguments.keys():
+                    print(key)
             saving_function(**saving_function_arguments)
         else:
             saving_function(df=dimension_df)
