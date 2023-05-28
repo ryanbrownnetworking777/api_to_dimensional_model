@@ -161,9 +161,11 @@ cython_debug/
 
 
 # Testing Jupyter notebooks
-/**/*.ipynb
+/**/testing*.ipynb
 !/**/example*.ipynb
 # Exclude any CSV files generated through testing. 
 /**/*.csv
 # Exclude buffer for copy_pasting into vim
 /**/copy_pasta
+# Testing Python scripts
+/**/testing*.py
