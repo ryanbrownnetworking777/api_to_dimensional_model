@@ -82,9 +82,12 @@ def deactivate_dimension_entries(dimension_df, entries_to_deactivate_df )-> pd.D
     dimension_df['is_active'] = is_active
     # print(f"{len(to_deactivate_entries_locations)} deactivated from dimension {dimension_name}")
     return dimension_df
+
 '''
 Conversion function is a function that will take a list of columnsa and return another list of columns in the order desired for the final dimension table. Conversion function arguments are arguments passed as a dictionary and expanded using ** notation in the processing function. table_check_function will return a boolean for whether or not the table already exists, and arguments are passed as a dictionary and expanded using ** notation.  
 '''
+
+#def execute_saving_function(saving_function, saving_function_arguments) -> None:
 
 
 def process_dimension(df, dimension_columns, dimension_name, conversion_function, conversion_function_arguments, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments) -> None: 
@@ -127,8 +130,15 @@ def process_dimension(df, dimension_columns, dimension_name, conversion_function
                         ,dimension_columns=new_dimension_columns
                         ,dimension_name = dimension_name
                         )
-        if saving_function_arguments !={}:
+        if saving_function_arguments != {}:
             saving_function_arguments['df'] = dimension_df
+            if 'additional_processing' in saving_function_arguments.keys():
+                additional_processing_string = saving_function_arguments['additional_processing']
+                compiled_additional_processing = compile(additional_processing_string,'<string>','exec')
+                eval(compiled_additional_processing)
+                saving_function_arguments.pop('additional_processing')
+                for key in saving_function_arguments.keys():
+                    print(key)
             saving_function(**saving_function_arguments)
         else:
             saving_function(df=dimension_df)
@@ -198,6 +208,13 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
     if  fact_check == False:
         if saving_function_arguments != {}:
             saving_function_arguments['df'] = fact_df
+            if 'additional_processing' in saving_function_arguments.keys():
+                additional_processing_string = saving_function_arguments['additional_processing']
+                compiled_additional_processing = compile(additional_processing_string,'<string>','exec')
+                eval(compiled_additional_processing)
+                saving_function_arguments.pop('additional_processing')
+                for key in saving_function_arguments.keys():
+                    print(key)
             saving_function(**saving_function_arguments)
         else:
             saving_function(df=fact_df)
@@ -208,11 +225,17 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
                               ,existing_fact_df=existing_fact_df 
                               ,fact_name=fact_name
                               ,date_column = date_column)
-        if saving_function_arguments !={}:
+        if saving_function_arguments != {}:
             saving_function_arguments['df'] = fact_df
+            if 'additional_processing' in saving_function_arguments.keys():
+                additional_processing_string = saving_function_arguments['additional_processing']
+                compiled_additional_processing = compile(additional_processing_string,'<string>','exec')
+                eval(compiled_additional_processing)
+                saving_function_arguments.pop('additional_processing')
+                for key in saving_function_arguments.keys():
+                    print(key)
             saving_function(**saving_function_arguments)
         else:
-            print("No arguments passed to saving functions")
             saving_function(df=fact_df)
         print(f"Fact table {fact_name} updated.")
     return 
