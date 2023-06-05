@@ -191,20 +191,24 @@ def create_fact(df, fact_column_processing_dict,fact_name='') -> pd.DataFrame:
 
 """
 To Do -- Switch this to accepting a criteria function with arguments so any number of cases can be handled.
+Function written will have to accept fact_df and existing_fact_df variables in addition to whatever arguments passed into the append function
 """
-def append_fact(fact_df, fact_name, existing_fact_df, date_column) -> pd.DataFrame:
-    max_date = existing_fact_df[date_column].max()
-    print(max_date)
-    new_fact_df = fact_df[fact_df[date_column]>=max_date]
+def append_fact(fact_df, fact_name, existing_fact_df, new_fact_df_function, new_fact_df_function_arguments) -> pd.DataFrame:
+    new_fact_df_function_arguments['existing_fact_df'] = existing_fact_df
+    new_fact_df_function_arguments['fact_df'] = fact_df
+    new_fact_df = new_fact_df_function(*new_fact_df_function_arguments)
     appended_len = len(new_fact_df)
     new_fact_df = pd.concat([existing_fact_df, new_fact_df]).drop_duplicates()
     print(f"{fact_name} fact appended with {appended_len} new records.")
     return new_fact_df
 
-def process_fact(df, fact_name, fact_column_processing_dict, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments, date_column)  -> None: 
+def process_fact(df, fact_name, fact_column_processing_dict, table_check_function, table_check_function_arguments, saving_function, saving_function_arguments, loading_function, loading_function_arguments, new_fact_df_function, new_fact_df_function_arguments)  -> None: 
     fact_df = create_fact(df=df, fact_column_processing_dict=fact_column_processing_dict, fact_name=fact_name)
     fact_check = table_check_function(**table_check_function_arguments) 
     print(fact_check)
+    if 'additional_processing' in saving_function_arguments.keys():
+        fact_id_string = f"{fact_name}_id"
+        print(fact_id_string)
     if  fact_check == False:
         if saving_function_arguments != {}:
             saving_function_arguments['df'] = fact_df
@@ -224,7 +228,8 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
         fact_df = append_fact(fact_df=fact_df 
                               ,existing_fact_df=existing_fact_df 
                               ,fact_name=fact_name
-                              ,date_column = date_column)
+                              ,new_fact_df_function=new_fact_df_function
+                              ,new_fact_df_function_arguments=new_fact_df_function_arguments)
         if saving_function_arguments != {}:
             saving_function_arguments['df'] = fact_df
             if 'additional_processing' in saving_function_arguments.keys():
