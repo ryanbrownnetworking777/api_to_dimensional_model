@@ -225,6 +225,9 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
         print(f"Fact table {fact_name} initalized.")
     elif fact_check == True:
         existing_fact_df = loading_function(**loading_function_arguments)
+        print(new_fact_df_function_arguments)
+        new_fact_df_function_arguments['existing_fact_df'] = existing_fact_df
+        new_fact_df_function_arguments['fact_df'] = fact_df
         fact_df = append_fact(fact_df=fact_df 
                               ,existing_fact_df=existing_fact_df 
                               ,fact_name=fact_name

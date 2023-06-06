@@ -167,5 +167,6 @@ cython_debug/
 /**/*.csv
 # Exclude buffer for copy_pasting into vim
 /**/copy_pasta
-# Testing Python scripts
+# Testing and sensisitive loading Python scripts
 /**/testing*.py
+/**/load*.py
