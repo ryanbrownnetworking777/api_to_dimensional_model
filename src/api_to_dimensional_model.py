@@ -196,7 +196,7 @@ Function written will have to accept fact_df and existing_fact_df variables in a
 def append_fact(fact_df, fact_name, existing_fact_df, new_fact_df_function, new_fact_df_function_arguments) -> pd.DataFrame:
     new_fact_df_function_arguments['existing_fact_df'] = existing_fact_df
     new_fact_df_function_arguments['fact_df'] = fact_df
-    new_fact_df = new_fact_df_function(*new_fact_df_function_arguments)
+    new_fact_df = new_fact_df_function(**new_fact_df_function_arguments)
     appended_len = len(new_fact_df)
     new_fact_df = pd.concat([existing_fact_df, new_fact_df]).drop_duplicates()
     print(f"{fact_name} fact appended with {appended_len} new records.")
@@ -218,7 +218,7 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
                 eval(compiled_additional_processing)
                 saving_function_arguments.pop('additional_processing')
                 for key in saving_function_arguments.keys():
-                    print(key)
+                    print(key, saving_function_arguments[key])
             saving_function(**saving_function_arguments)
         else:
             saving_function(df=fact_df)
@@ -237,11 +237,12 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
             saving_function_arguments['df'] = fact_df
             if 'additional_processing' in saving_function_arguments.keys():
                 additional_processing_string = saving_function_arguments['additional_processing']
+                print(additional_processing_string)
                 compiled_additional_processing = compile(additional_processing_string,'<string>','exec')
                 eval(compiled_additional_processing)
                 saving_function_arguments.pop('additional_processing')
                 for key in saving_function_arguments.keys():
-                    print(key)
+                    print(key, saving_function_arguments[key])
             saving_function(**saving_function_arguments)
         else:
             saving_function(df=fact_df)
