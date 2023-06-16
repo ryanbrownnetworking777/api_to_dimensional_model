@@ -11,10 +11,10 @@ author_email='ryanbrownnetworking777@gmail.com'
 
 [options]
 python_requires = ">=3.6"
+packages=find:
 
 [options.packages.find]
 where = "src"
 
 [metadata]
 license_files = "LICENSE"
-
