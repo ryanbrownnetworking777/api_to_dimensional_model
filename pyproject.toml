@@ -2,16 +2,16 @@
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
+[project]
 name = "api_to_dimensional_model"
 version = "0.0.1"
 description='Take the results of an API endpoint, and process them into star schema with Python.'
-author='Ryan Brown'
-author_email='ryanbrownnetworking777@gmail.com'
+authors = [
+{name = "Ryan Brown", email = "ryanbrownnetworking777@gmail.com"}
+]
 
 [options]
 python_requires = ">=3.6"
-packages=find:
 
 [options.packages.find]
 where = "src"
