@@ -16,7 +16,7 @@ dirname = os.path.dirname(__file__)
 # Save version and author to __meta__.py
 setup(
     # Basic info
-    name='apitodimensionalmodel',
+    name='api_to_dimensional_model',
     version='0.0.1',
     author='Ryan Brown',
     author_email='ryanbrownnetworking777@gmail.com',
@@ -32,11 +32,12 @@ setup(
     ],
 
     # Packages and depencies
-    package_dir={'': 'src'},
-    packages=find_packages('src'),
+#    package_dir={'': 'src'},
+    packages=find_packages(),
     install_requires=[
         'pandas'
         ,'requests'
+        ,'pyyaml'
     ],
     extras_require={
         'dev': [
@@ -49,11 +50,8 @@ setup(
     },
     # Data files
     package_data={
-        'api_to_dimensional_model': [
-            'templates/*.*',
-            'templates/license/*.*',
-            'templates/docs/*.*',
-            'templates/package/*.*'
+        'src/api_to_dimensional_model': [
+            '*.*'
         ],
     },
 
