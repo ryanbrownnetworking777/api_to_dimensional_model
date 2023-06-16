@@ -16,7 +16,7 @@ dirname = os.path.dirname(__file__)
 # Save version and author to __meta__.py
 setup(
     # Basic info
-    name='api_to_dimensional_model',
+    name='apitodimensionalmodel',
     version='0.0.1',
     author='Ryan Brown',
     author_email='ryanbrownnetworking777@gmail.com',
