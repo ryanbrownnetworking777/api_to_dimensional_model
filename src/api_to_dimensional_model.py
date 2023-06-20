@@ -232,7 +232,7 @@ def process_fact(df, fact_name, fact_column_processing_dict, table_check_functio
                               ,existing_fact_df=existing_fact_df 
                               ,fact_name=fact_name
                               ,new_fact_df_function=new_fact_df_function
-                              ,new_fact_df_function_arguments=new_fact_df_function_arguments)
+                              ,new_fact_df_function_arguments=new_fact_df_function_arguments).drop_duplicates()
         if saving_function_arguments != {}:
             saving_function_arguments['df'] = fact_df
             if 'additional_processing' in saving_function_arguments.keys():
