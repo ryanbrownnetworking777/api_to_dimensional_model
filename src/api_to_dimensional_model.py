@@ -176,7 +176,7 @@ def create_fact(df, fact_column_processing_dict,fact_name='') -> pd.DataFrame:
     new_columns = [column_key for column_key in fact_column_processing_dict.keys()]
     for new_column in new_columns:
         column_dict = fact_column_processing_dict[new_column]
-        df[new_column] = column_dict['processing_function'](**column_dict['processing_function_arguments'])
+        df[new_column] = [val for val in (column_dict['processing_function'](**column_dict['processing_function_arguments']))]
     if fact_name !="":
         fact_id_string = f"{fact_name}_id"
         to_concat_columns = [column_key for column_key 
