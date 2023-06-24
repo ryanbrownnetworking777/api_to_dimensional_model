@@ -161,15 +161,14 @@ A dictionary will specify the following:
 def string_columns_to_integer_id(df, id_column_name, fact_columns, dimension_columns, loading_function, loading_function_arguments):
     dimension_df = loading_function(**loading_function_arguments)
     id_df = df[fact_columns]
-    # print(id_df)
-    # print(dimension_df[dimension_columns])
+    id_df['Original Order'] = [i for i in range(0, len(id_df))]
     id = pd.merge(
             id_df
             ,dimension_df
             ,how='inner'
             ,left_on=fact_columns
             ,right_on=dimension_columns
-            )[id_column_name]
+            ).sort_values(by='Original Order')[id_column_name]
     return id
     
 
